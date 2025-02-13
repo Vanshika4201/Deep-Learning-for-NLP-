@@ -1,0 +1,875 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "080d50fc",
+        "outputId": "de9c069e-a48d-4b73-b234-9105103826ae"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting portalocker\n",
+            "  Downloading portalocker-2.8.2-py3-none-any.whl (17 kB)\n",
+            "Installing collected packages: portalocker\n",
+            "Successfully installed portalocker-2.8.2\n",
+            "Collecting torchmetrics\n",
+            "  Downloading torchmetrics-1.3.2-py3-none-any.whl (841 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m841.5/841.5 kB\u001b[0m \u001b[31m17.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: numpy>1.20.0 in /usr/local/lib/python3.10/dist-packages (from torchmetrics) (1.25.2)\n",
+            "Requirement already satisfied: packaging>17.1 in /usr/local/lib/python3.10/dist-packages (from torchmetrics) (24.0)\n",
+            "Requirement already satisfied: torch>=1.10.0 in /usr/local/lib/python3.10/dist-packages (from torchmetrics) (2.2.1+cu121)\n",
+            "Collecting lightning-utilities>=0.8.0 (from torchmetrics)\n",
+            "  Downloading lightning_utilities-0.11.2-py3-none-any.whl (26 kB)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from lightning-utilities>=0.8.0->torchmetrics) (67.7.2)\n",
+            "Requirement already satisfied: typing-extensions in /usr/local/lib/python3.10/dist-packages (from lightning-utilities>=0.8.0->torchmetrics) (4.10.0)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (3.13.3)\n",
+            "Requirement already satisfied: sympy in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (1.12)\n",
+            "Requirement already satisfied: networkx in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (3.2.1)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (3.1.3)\n",
+            "Requirement already satisfied: fsspec in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (2023.6.0)\n",
+            "Collecting nvidia-cuda-nvrtc-cu12==12.1.105 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (23.7 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m23.7/23.7 MB\u001b[0m \u001b[31m61.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cuda-runtime-cu12==12.1.105 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (823 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m823.6/823.6 kB\u001b[0m \u001b[31m71.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cuda-cupti-cu12==12.1.105 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (14.1 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m14.1/14.1 MB\u001b[0m \u001b[31m96.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cudnn-cu12==8.9.2.26 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl (731.7 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m731.7/731.7 MB\u001b[0m \u001b[31m2.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cublas-cu12==12.1.3.1 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl (410.6 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m410.6/410.6 MB\u001b[0m \u001b[31m2.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cufft-cu12==11.0.2.54 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl (121.6 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m121.6/121.6 MB\u001b[0m \u001b[31m8.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-curand-cu12==10.3.2.106 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl (56.5 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m56.5/56.5 MB\u001b[0m \u001b[31m11.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cusolver-cu12==11.4.5.107 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl (124.2 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m124.2/124.2 MB\u001b[0m \u001b[31m8.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-cusparse-cu12==12.1.0.106 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl (196.0 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m196.0/196.0 MB\u001b[0m \u001b[31m6.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-nccl-cu12==2.19.3 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_nccl_cu12-2.19.3-py3-none-manylinux1_x86_64.whl (166.0 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m166.0/166.0 MB\u001b[0m \u001b[31m2.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting nvidia-nvtx-cu12==12.1.105 (from torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl (99 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m99.1/99.1 kB\u001b[0m \u001b[31m15.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: triton==2.2.0 in /usr/local/lib/python3.10/dist-packages (from torch>=1.10.0->torchmetrics) (2.2.0)\n",
+            "Collecting nvidia-nvjitlink-cu12 (from nvidia-cusolver-cu12==11.4.5.107->torch>=1.10.0->torchmetrics)\n",
+            "  Downloading nvidia_nvjitlink_cu12-12.4.99-py3-none-manylinux2014_x86_64.whl (21.1 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m21.1/21.1 MB\u001b[0m \u001b[31m80.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.10/dist-packages (from jinja2->torch>=1.10.0->torchmetrics) (2.1.5)\n",
+            "Requirement already satisfied: mpmath>=0.19 in /usr/local/lib/python3.10/dist-packages (from sympy->torch>=1.10.0->torchmetrics) (1.3.0)\n",
+            "Installing collected packages: nvidia-nvtx-cu12, nvidia-nvjitlink-cu12, nvidia-nccl-cu12, nvidia-curand-cu12, nvidia-cufft-cu12, nvidia-cuda-runtime-cu12, nvidia-cuda-nvrtc-cu12, nvidia-cuda-cupti-cu12, nvidia-cublas-cu12, lightning-utilities, nvidia-cusparse-cu12, nvidia-cudnn-cu12, nvidia-cusolver-cu12, torchmetrics\n",
+            "Successfully installed lightning-utilities-0.11.2 nvidia-cublas-cu12-12.1.3.1 nvidia-cuda-cupti-cu12-12.1.105 nvidia-cuda-nvrtc-cu12-12.1.105 nvidia-cuda-runtime-cu12-12.1.105 nvidia-cudnn-cu12-8.9.2.26 nvidia-cufft-cu12-11.0.2.54 nvidia-curand-cu12-10.3.2.106 nvidia-cusolver-cu12-11.4.5.107 nvidia-cusparse-cu12-12.1.0.106 nvidia-nccl-cu12-2.19.3 nvidia-nvjitlink-cu12-12.4.99 nvidia-nvtx-cu12-12.1.105 torchmetrics-1.3.2\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install portalocker\n",
+        "!pip install torchmetrics"
+      ],
+      "id": "080d50fc"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "id": "B9XxyEQVWrO6"
+      },
+      "outputs": [],
+      "source": [
+        "import argparse\n",
+        "import logging\n",
+        "import time\n",
+        "\n",
+        "import torch\n",
+        "from torch.utils.data import DataLoader\n",
+        "from torch.utils.data.dataset import random_split\n",
+        "from torchtext.data.functional import to_map_style_dataset\n",
+        "from torchtext.data.utils import get_tokenizer, ngrams_iterator\n",
+        "from torchtext.datasets import DATASETS\n",
+        "from torchtext.prototype.transforms import load_sp_model, PRETRAINED_SP_MODEL, SentencePieceTokenizer\n",
+        "from torchtext.utils import download_from_url\n",
+        "from torchtext.vocab import build_vocab_from_iterator\n",
+        "import torch.nn as nn\n",
+        "from torch.nn.utils.rnn import pad_sequence\n",
+        "import torch.nn.functional as F\n",
+        "from torchtext.vocab import GloVe\n",
+        "from tqdm import tqdm\n",
+        "\n",
+        "torch.autograd.set_detect_anomaly(True)\n",
+        "\n",
+        "FILL = '_FILL_'"
+      ],
+      "id": "B9XxyEQVWrO6"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "66eb271d"
+      },
+      "source": [
+        "### Information\n",
+        "- torchtext repo: https://github.com/pytorch/text/tree/main/torchtext\n",
+        "- torchtext documentation: https://pytorch.org/text/stable/index.html"
+      ],
+      "id": "66eb271d"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "id": "8c949153"
+      },
+      "outputs": [],
+      "source": [],
+      "id": "8c949153"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "12d93d22"
+      },
+      "source": [
+        "### Constants"
+      ],
+      "id": "12d93d22"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 3,
+      "metadata": {
+        "id": "329c056d"
+      },
+      "outputs": [],
+      "source": [
+        "DATASET = \"AG_NEWS\"\n",
+        "DATA_DIR = \".data\"\n",
+        "DEVICE = \"cpu\"\n",
+        "EMBED_DIM = 300\n",
+        "LR = 1.0\n",
+        "BATCH_SIZE = 128\n",
+        "NUM_EPOCHS = 5\n",
+        "PADDING_VALUE = 0\n",
+        "PADDING_IDX = PADDING_VALUE"
+      ],
+      "id": "329c056d"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "1a61aede"
+      },
+      "source": [
+        "### Get the tokenizer\n",
+        "- Use the WordLevel tokenizer.\n"
+      ],
+      "id": "1a61aede"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 4,
+      "metadata": {
+        "id": "93e3b7cb"
+      },
+      "outputs": [],
+      "source": [
+        "# Get basic tokenizer\n",
+        "basic_english_tokenizer = get_tokenizer(\"basic_english\")"
+      ],
+      "id": "93e3b7cb"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 5,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "aa4b78e4",
+        "outputId": "180b7747-2cb8-4e0e-d0ec-1ebe5a741cdf"
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['this', 'is', 'some', 'text', '.', '.', '.']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 5
+        }
+      ],
+      "source": [
+        "basic_english_tokenizer(\"This is some text ...\")"
+      ],
+      "id": "aa4b78e4"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 6,
+      "metadata": {
+        "id": "505cf5ec"
+      },
+      "outputs": [],
+      "source": [
+        "# Needed later; set this to the tokenizer above\n",
+        "TOKENIZER = basic_english_tokenizer"
+      ],
+      "id": "505cf5ec"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "64096cd8"
+      },
+      "source": [
+        "### Get the data and get the vocabulary"
+      ],
+      "id": "64096cd8"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 7,
+      "metadata": {
+        "id": "ce4a0578"
+      },
+      "outputs": [],
+      "source": [
+        "def yield_tokens(data_iter):\n",
+        "    for _, text in data_iter:\n",
+        "        yield TOKENIZER(text)"
+      ],
+      "id": "ce4a0578"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 8,
+      "metadata": {
+        "id": "f48f23ab"
+      },
+      "outputs": [],
+      "source": [
+        "train_iter = DATASETS[DATASET](root=DATA_DIR, split=\"train\")\n",
+        "VOCAB = build_vocab_from_iterator(yield_tokens(train_iter), specials=('<pad>', '<unk>'))\n",
+        "\n",
+        "# Make the default index the same as that of the unk_token.\n",
+        "VOCAB.set_default_index(VOCAB['<unk>'])"
+      ],
+      "id": "f48f23ab"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "31ce9367"
+      },
+      "source": [
+        "### Get GLOVE embeddings"
+      ],
+      "id": "31ce9367"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 9,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "a43f0226",
+        "outputId": "5fbc56f3-c26e-4851-b1df-cd47b307006b"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            ".vector_cache/glove.6B.zip: 862MB [02:41, 5.35MB/s]                           \n",
+            "100%|█████████▉| 399999/400000 [00:50<00:00, 7915.97it/s]\n"
+          ]
+        }
+      ],
+      "source": [
+        "# Get the GloVe embeddings; this will be slow\n",
+        "GLOVE = GloVe(name='6B', dim=300)"
+      ],
+      "id": "a43f0226"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 23,
+      "metadata": {
+        "id": "6302f433",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d5f5a184-c7df-41b9-a1e2-8024142a8009"
+      },
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "(400000, torch.Size([400000, 300]))"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 23
+        }
+      ],
+      "source": [
+        "len(GLOVE), GLOVE.vectors.shape"
+      ],
+      "id": "6302f433"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "200b05fc"
+      },
+      "source": [
+        "### Helper functions"
+      ],
+      "id": "200b05fc"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 25,
+      "metadata": {
+        "id": "16ca1ef5"
+      },
+      "outputs": [],
+      "source": [
+        "def text_pipeline(text):\n",
+        "    return VOCAB(TOKENIZER(text))\n",
+        "\n",
+        "def label_pipeline(label):\n",
+        "    return int(label) - 1"
+      ],
+      "id": "16ca1ef5"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "67ef6734"
+      },
+      "source": [
+        "Nice link on collate_fn and DataLoader in PyTorch: https://python.plainenglish.io/understanding-collate-fn-in-pytorch-f9d1742647d3"
+      ],
+      "id": "67ef6734"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 27,
+      "metadata": {
+        "id": "ff479986"
+      },
+      "outputs": [],
+      "source": [
+        "# As before, loop through the batch and transform into tensors\n",
+        "def collate_batch(batch):\n",
+        "    label_list, text_list = [], []\n",
+        "    for (_label, _text) in batch:\n",
+        "        # Get the label from {1, 2, 3, 4} to {0, 1, 2, 3}\n",
+        "        label_list.append(label_pipeline(_label))\n",
+        "        # Return a list of ints\n",
+        "        processed_text = torch.tensor(text_pipeline(_text), dtype=torch.int64)\n",
+        "        # Append to text_list\n",
+        "        text_list.append(processed_text.clone().detach())\n",
+        "\n",
+        "    # Pad and make into tensors as needed\n",
+        "    label_list = torch.tensor(label_list, dtype=torch.int64)\n",
+        "    text_list = pad_sequence(text_list, batch_first = True, padding_value = PADDING_VALUE)\n",
+        "\n",
+        "    return label_list.to(DEVICE), text_list.to(DEVICE)"
+      ],
+      "id": "ff479986"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "c7fcf425"
+      },
+      "source": [
+        "### Get the data"
+      ],
+      "id": "c7fcf425"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 28,
+      "metadata": {
+        "id": "e617ddce",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "d9f4d903-4aed-4341-94d3-988d7f2ed0c5"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "The number of classes is 4 ...\n"
+          ]
+        }
+      ],
+      "source": [
+        "train_iter = DATASETS[DATASET](root=DATA_DIR, split=\"train\")\n",
+        "num_class = len(set([label for (label, _) in train_iter]))\n",
+        "# What are the classes?\n",
+        "print(f\"The number of classes is {num_class} ...\")"
+      ],
+      "id": "e617ddce"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "5aa8a40d"
+      },
+      "source": [
+        "### Set up the model"
+      ],
+      "id": "5aa8a40d"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "8abf2ede"
+      },
+      "source": [
+        "Good reference on this type of model\n",
+        "- CNN for Sentence Classification: https://arxiv.org/pdf/1408.5882.pdf\n",
+        "\n",
+        "You can build CNN models with either CNN1d or CNN2d."
+      ],
+      "id": "8abf2ede"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 29,
+      "metadata": {
+        "id": "dc51c359"
+      },
+      "outputs": [],
+      "source": [
+        "class CNN1dTextClassificationModel(nn.Module):\n",
+        "    def __init__(\n",
+        "        self,\n",
+        "        vocab_size,\n",
+        "        num_class,\n",
+        "        embed_dim = 300,\n",
+        "        use_pretrained = True,\n",
+        "        fine_tune_embeddings = True\n",
+        "    ):\n",
+        "\n",
+        "        super(CNN1dTextClassificationModel, self).__init__()\n",
+        "\n",
+        "        self.embedding = nn.Embedding(\n",
+        "            vocab_size,\n",
+        "            embed_dim,\n",
+        "            padding_idx=PADDING_IDX\n",
+        "        )\n",
+        "\n",
+        "        if use_pretrained:\n",
+        "            # Set the embeddings to not requiring gradients since we'll try and modify\n",
+        "            self.embedding.weight.requires_grad = False\n",
+        "            for i in range(vocab_size):\n",
+        "                # Get the token for the index i.\n",
+        "                token = VOCAB.lookup_tokens([i])[0]\n",
+        "\n",
+        "                # Get the embedding for the token and put it in index i.\n",
+        "                self.embedding.weight[i, :] = GLOVE[token]\n",
+        "            self.embedding.weight.requires_grad = True\n",
+        "        else:\n",
+        "            self.init_weights()\n",
+        "\n",
+        "        if not fine_tune_embeddings:\n",
+        "            self.embedding.weight.requires_grad = False\n",
+        "\n",
+        "        # Define a Conv1d layer that collapses all the channels and does not collapse the time dimension\n",
+        "        self.cnn1 = nn.Conv1d(in_channels=embed_dim, out_channels=1, kernel_size=1)\n",
+        "\n",
+        "        # Set up 3 Conv1d layers. Use kernel size 2, 3, 4.\n",
+        "        # There is only 1 filter for each kernel size.\n",
+        "        self.cnn2 = nn.Conv1d(in_channels=embed_dim, out_channels=1, kernel_size=2)\n",
+        "        self.cnn3 = nn.Conv1d(in_channels=embed_dim, out_channels=1, kernel_size=3)\n",
+        "        self.cnn4 = nn.Conv1d(in_channels=embed_dim, out_channels=1, kernel_size=4)\n",
+        "\n",
+        "        # This should be linear mapping to the number of output classes.\n",
+        "        self.fc = nn.Linear(3, num_class)\n",
+        "\n",
+        "        # For drop out + ReLu, order does not matter.\n",
+        "        # Use 0.3\n",
+        "        self.dropout = nn.Dropout(p=0.3)\n",
+        "\n",
+        "        # Set to True at first, then set to False.\n",
+        "        self.debug = False\n",
+        "\n",
+        "    def init_weights(self):\n",
+        "        initrange = 0.5\n",
+        "        self.embedding.weight.data.uniform_(-initrange, initrange)\n",
+        "        self.fc.weight.data.uniform_(-initrange, initrange)\n",
+        "        self.fc.bias.data.zero_()\n",
+        "\n",
+        "    # N = batch_size, L = sequence length, D = embed_dim\n",
+        "    def forward(self, text):\n",
+        "\n",
+        "        # N X L X embed_dim\n",
+        "        embedded = self.embedding(text)\n",
+        "\n",
+        "        if self.debug:\n",
+        "            print('embedding', embedded.shape)\n",
+        "\n",
+        "        # N X embed_dim X L\n",
+        "        # Here we need to transpose because conv takes data with embed_dim number of channels.\n",
+        "        embedded = embedded.transpose(1, 2)\n",
+        "\n",
+        "        # B X 1\n",
+        "        # Take Max pooling over time\n",
+        "        cnn1 = self.cnn1(embedded)\n",
+        "        if self.debug:\n",
+        "            print('cnn1 after max pool', cnn1.shape)\n",
+        "\n",
+        "        # B X 1 X L - 1\n",
+        "        cnn2 = self.cnn2(embedded)\n",
+        "        if self.debug:\n",
+        "            print('cnn2', cnn2.shape)\n",
+        "\n",
+        "        # B X 1 X L - 2\n",
+        "        cnn3 = self.cnn3(embedded)\n",
+        "        if self.debug:\n",
+        "            print('cnn3', cnn3.shape)\n",
+        "\n",
+        "        # B X 1 X L - 3\n",
+        "        cnn4 = self.cnn4(embedded)\n",
+        "        if self.debug:\n",
+        "            print('cnn4', cnn4.shape)\n",
+        "\n",
+        "        # B X 1 in all cases. Run each filter through a max pooling layer.\n",
+        "        cnn2 = nn.MaxPool1d(cnn2.shape[2])(cnn2)\n",
+        "        cnn3 = nn.MaxPool1d(cnn3.shape[2])(cnn3)\n",
+        "        cnn4 = nn.MaxPool1d(cnn4.shape[2])(cnn4)\n",
+        "        if self.debug:\n",
+        "            print('cnn2 after max', cnn2.shape)\n",
+        "\n",
+        "        # B X 3\n",
+        "        # Concatenate these, and apply dropout.\n",
+        "        cnn_concat = torch.cat((cnn2, cnn3, cnn4), dim=2)\n",
+        "        if self.debug:\n",
+        "            print('cnn concat', cnn_concat.shape)\n",
+        "\n",
+        "        # Use fc to map to the output number.\n",
+        "        out = self.fc(cnn_concat)\n",
+        "\n",
+        "        # Set this to False after going through one batch od data.\n",
+        "        self.debug = False\n",
+        "\n",
+        "        return out"
+      ],
+      "id": "dc51c359"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "3b3c6ed5"
+      },
+      "source": [
+        "### Set up the model"
+      ],
+      "id": "3b3c6ed5"
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# If this is True, we will initialize the Embedding layer with GLOVE\n",
+        "USE_PRETRAINED = True,\n",
+        "\n",
+        "# If this is True, we will allow for gradient updates on the nn.Embedding layer\n",
+        "FINE_TUNE_EMBEDDINGS = True\n",
+        "\n",
+        "# Set the loss\n",
+        "criterion = torch.nn.CrossEntropyLoss().to(DEVICE)\n",
+        "\n",
+        "# Set the model\n",
+        "model = CNN1dTextClassificationModel(len(VOCAB), num_class, use_pretrained= USE_PRETRAINED, fine_tune_embeddings=FINE_TUNE_EMBEDDINGS)\n",
+        "\n",
+        "optimizer = torch.optim.SGD(model.parameters(), lr=LR)\n",
+        "scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 1.0, gamma=0.1)\n"
+      ],
+      "metadata": {
+        "id": "-YI3He_5-h9G"
+      },
+      "id": "-YI3He_5-h9G",
+      "execution_count": 30,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "26266d8a"
+      },
+      "source": [
+        "### Set up the data"
+      ],
+      "id": "26266d8a"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 32,
+      "metadata": {
+        "id": "9c0aebb5"
+      },
+      "outputs": [],
+      "source": [
+        "train_iter, test_iter = DATASETS[DATASET]()\n",
+        "train_dataset = to_map_style_dataset(train_iter)\n",
+        "test_dataset = to_map_style_dataset(test_iter)\n",
+        "\n",
+        "num_train = int(len(train_dataset) * 0.95)\n",
+        "split_train_, split_valid_ = random_split(train_dataset, [num_train, len(train_dataset) - num_train])\n",
+        "\n",
+        "train_dataloader = DataLoader(split_train_, batch_size=BATCH_SIZE, shuffle=True)\n",
+        "valid_dataloader = DataLoader(split_valid_, batch_size=BATCH_SIZE, shuffle=False)\n",
+        "test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)"
+      ],
+      "id": "9c0aebb5"
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "86476e2a"
+      },
+      "source": [
+        "### Train the model"
+      ],
+      "id": "86476e2a"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 38,
+      "metadata": {
+        "id": "24950481"
+      },
+      "outputs": [],
+      "source": [
+        "def train(dataloader, model, optimizer, criterion, epoch):\n",
+        "    model.train()\n",
+        "    total_acc, total_count = 0, 0\n",
+        "    total_loss, total_batches = 0.0, 0\n",
+        "    total_zero_gradients_percentage = []\n",
+        "    log_interval = 10\n",
+        "\n",
+        "    for idx, (label, text) in tqdm(enumerate(dataloader)):\n",
+        "        # Set gradients to zero\n",
+        "        optimizer.zero_grad()\n",
+        "\n",
+        "        # Get the predictions\n",
+        "        predicted_label = model(text)\n",
+        "\n",
+        "        # Get the loss.\n",
+        "        loss = criterion(input=predicted_label, target=label)\n",
+        "\n",
+        "        # Do back propagation.\n",
+        "        loss.backward()\n",
+        "\n",
+        "        # Get the loss per batch and the number of batches\n",
+        "        with torch.no_grad():\n",
+        "            total_loss += loss.item()\n",
+        "            total_batches += 1\n",
+        "\n",
+        "        # Loop through all the parameters\n",
+        "        # Specifically, for this batch, get the percentage of zero gradients across all parameters\n",
+        "        # Append this to the list above which will print out the total every 10 batches\n",
+        "        total_nonzero_gradients = 0.0\n",
+        "        total_param_count = 0.0\n",
+        "        for param in model.parameters():\n",
+        "            if param.grad is not None:\n",
+        "                total_nonzero_gradients += torch.count_nonzero(param.grad)\n",
+        "                total_param_count += torch.numel(param.grad)\n",
+        "\n",
+        "        if total_param_count > 0:\n",
+        "            zero_gradients_percentage = (1 - (total_nonzero_gradients / total_param_count)) * 100\n",
+        "            total_zero_gradients_percentage.append(zero_gradients_percentage.item())\n",
+        "\n",
+        "            # Clip the gradient\n",
+        "            clip_value = 10.0  # You can adjust this based on your specific scenario\n",
+        "            torch.nn.utils.clip_grad_norm_(model.parameters(), clip_value)\n",
+        "\n",
+        "            # Do an optimization step\n",
+        "            optimizer.step()\n",
+        "\n",
+        "        # Get the accuracy\n",
+        "        total_acc += (predicted_label.argmax(1) == label).sum().item()\n",
+        "        total_count += label.size(0)\n",
+        "\n",
+        "        # Log results\n",
+        "        if idx % log_interval == 0 and idx > 0:\n",
+        "            print(\n",
+        "                \"| epoch {:3d} | {:5d}/{:5d} batches \"\n",
+        "                \"| accuracy {:8.3f} \"\n",
+        "                \"| loss {:8.3f} \"\n",
+        "                \"| zero gradients percentage {:8.3f}\".format(\n",
+        "                    epoch, idx,\n",
+        "                    len(dataloader),\n",
+        "                    total_acc / total_count,\n",
+        "                    total_loss / total_batches,\n",
+        "                    torch.tensor(total_zero_gradients_percentage).mean().item()\n",
+        "                    )\n",
+        "            )\n",
+        "            # Reset variables as needed\n",
+        "            total_acc, total_count = 0, 0\n",
+        "            total_loss, total_batches = 0.0, 0\n",
+        "            total_zero_gradients_percentage = []\n"
+      ],
+      "id": "24950481"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 39,
+      "metadata": {
+        "id": "39a702be"
+      },
+      "outputs": [],
+      "source": [
+        "def evaluate(dataloader, model, criterion):\n",
+        "    model.eval()\n",
+        "    total_acc, total_count = 0, 0\n",
+        "    total_loss = 0.0\n",
+        "\n",
+        "    with torch.no_grad():\n",
+        "        for idx, (label, text) in enumerate(dataloader):\n",
+        "            predicted_label = model(text)\n",
+        "            loss = criterion(predicted_label, label)\n",
+        "            total_acc += (predicted_label.argmax(1) == label).sum().item()\n",
+        "            total_count += label.size(0)\n",
+        "            total_loss += loss.item()\n",
+        "    return total_acc / total_count, total_loss / total_count"
+      ],
+      "id": "39a702be"
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 40,
+      "metadata": {
+        "id": "a9e02c09",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 458
+        },
+        "outputId": "b5b65431-e8ab-48bc-85ea-28d6d86d3018"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "0it [00:00, ?it/s]\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "TypeError",
+          "evalue": "embedding(): argument 'indices' (position 2) must be Tensor, not tuple",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mTypeError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-40-63467c68b814>\u001b[0m in \u001b[0;36m<cell line: 1>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mepoch\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mrange\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mNUM_EPOCHS\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m     \u001b[0mepoch_start_time\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mtime\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m     \u001b[0mtrain\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtrain_dataloader\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmodel\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0moptimizer\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcriterion\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mepoch\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m     \u001b[0maccu_val\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mloss_val\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mevaluate\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvalid_dataloader\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmodel\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcriterion\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mscheduler\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstep\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m<ipython-input-38-5f5245ff8042>\u001b[0m in \u001b[0;36mtrain\u001b[0;34m(dataloader, model, optimizer, criterion, epoch)\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m         \u001b[0;31m# Get the predictions\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 13\u001b[0;31m         \u001b[0mpredicted_label\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmodel\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     14\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     15\u001b[0m         \u001b[0;31m# Get the loss.\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py\u001b[0m in \u001b[0;36m_wrapped_call_impl\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1509\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_compiled_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m  \u001b[0;31m# type: ignore[misc]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1510\u001b[0m         \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1511\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1512\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1513\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py\u001b[0m in \u001b[0;36m_call_impl\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1518\u001b[0m                 \u001b[0;32mor\u001b[0m \u001b[0m_global_backward_pre_hooks\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0m_global_backward_hooks\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1519\u001b[0m                 or _global_forward_hooks or _global_forward_pre_hooks):\n\u001b[0;32m-> 1520\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mforward_call\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1521\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1522\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m<ipython-input-29-ccb6b73fc376>\u001b[0m in \u001b[0;36mforward\u001b[0;34m(self, text)\u001b[0m\n\u001b[1;32m     62\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     63\u001b[0m         \u001b[0;31m# N X L X embed_dim\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 64\u001b[0;31m         \u001b[0membedded\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0membedding\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     65\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     66\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py\u001b[0m in \u001b[0;36m_wrapped_call_impl\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1509\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_compiled_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m  \u001b[0;31m# type: ignore[misc]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1510\u001b[0m         \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1511\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1512\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1513\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0m_call_impl\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/modules/module.py\u001b[0m in \u001b[0;36m_call_impl\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1518\u001b[0m                 \u001b[0;32mor\u001b[0m \u001b[0m_global_backward_pre_hooks\u001b[0m \u001b[0;32mor\u001b[0m \u001b[0m_global_backward_hooks\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1519\u001b[0m                 or _global_forward_hooks or _global_forward_pre_hooks):\n\u001b[0;32m-> 1520\u001b[0;31m             \u001b[0;32mreturn\u001b[0m \u001b[0mforward_call\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1521\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1522\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/modules/sparse.py\u001b[0m in \u001b[0;36mforward\u001b[0;34m(self, input)\u001b[0m\n\u001b[1;32m    161\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    162\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mforward\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minput\u001b[0m\u001b[0;34m:\u001b[0m \u001b[0mTensor\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m->\u001b[0m \u001b[0mTensor\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 163\u001b[0;31m         return F.embedding(\n\u001b[0m\u001b[1;32m    164\u001b[0m             \u001b[0minput\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mweight\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpadding_idx\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmax_norm\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    165\u001b[0m             self.norm_type, self.scale_grad_by_freq, self.sparse)\n",
+            "\u001b[0;32m/usr/local/lib/python3.10/dist-packages/torch/nn/functional.py\u001b[0m in \u001b[0;36membedding\u001b[0;34m(input, weight, padding_idx, max_norm, norm_type, scale_grad_by_freq, sparse)\u001b[0m\n\u001b[1;32m   2235\u001b[0m         \u001b[0;31m# remove once script supports set_grad_enabled\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2236\u001b[0m         \u001b[0m_no_grad_embedding_renorm_\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mweight\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minput\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmax_norm\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnorm_type\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 2237\u001b[0;31m     \u001b[0;32mreturn\u001b[0m \u001b[0mtorch\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0membedding\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mweight\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minput\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mpadding_idx\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mscale_grad_by_freq\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msparse\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   2238\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   2239\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mTypeError\u001b[0m: embedding(): argument 'indices' (position 2) must be Tensor, not tuple"
+          ]
+        }
+      ],
+      "source": [
+        "for epoch in range(1, NUM_EPOCHS + 1):\n",
+        "    epoch_start_time = time.time()\n",
+        "    train(train_dataloader, model, optimizer, criterion, epoch)\n",
+        "    accu_val, loss_val = evaluate(valid_dataloader, model, criterion)\n",
+        "    scheduler.step()\n",
+        "    print(\"-\" * 59)\n",
+        "    print(\n",
+        "        \"| end of epoch {:3d} | time: {:5.2f}s | \"\n",
+        "        \"valid accuracy {:8.3f} \".format(\n",
+        "            epoch,\n",
+        "            time.time() - epoch_start_time,\n",
+        "            accu_val,\n",
+        "            loss_val\n",
+        "            )\n",
+        "    )\n",
+        "    print(\"-\" * 59)\n",
+        "\n",
+        "print(\"Checking the results of test dataset.\")\n",
+        "accu_test, loss_test = evaluate(test_dataloader, model, criterion)\n",
+        "print(\"test accuracy {:8.3f}\".format(accu_test))\n",
+        "print(\"test loss {:8.3f}\".format(loss_test))"
+      ],
+      "id": "a9e02c09"
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "znpF-SjvQKph"
+      },
+      "id": "znpF-SjvQKph",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "lcSKfO2rQ_g2"
+      },
+      "id": "lcSKfO2rQ_g2",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4"
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "file_extension": ".py",
+      "mimetype": "text/x-python",
+      "name": "python",
+      "nbconvert_exporter": "python",
+      "pygments_lexer": "ipython3",
+      "version": "3.8.15"
+    },
+    "accelerator": "GPU"
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
